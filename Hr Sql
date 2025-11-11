@@ -1,0 +1,246 @@
+
+create database HRAnalysis;
+use hranalysis;
+select * from hrdata;
+------------------------------------------------------------------------------------------------------------------------------------------------------
+#KPI
+
+#AVERAGE MONTHLY INCOME 
+SELECT AVG(MONTHLYINCOME)AS AVG_INCIME FROM HRDATA;
+
+#AVERAGE TENURE 
+SELECT AVG(TOTALWORKINGYEARS) AS AVG_TENURE FROM HRDATA;
+
+#AVG Attrition
+SELECT ROUND((SUM(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) * 100.0) / COUNT(*),2) AS AverageAttritionRate
+FROM hrdata;
+
+
+#AVG HourlyRate (male)
+SELECT AVG(HourlyRate) AS Avg_HourlyRate_Male_ResearchScientist FROM hrdata
+WHERE Gender = 'Male'AND JobRole = 'Research Scientist';
+
+
+#AVERAGE AGE
+select avg(AGE) AS AVG_AGE FROM HRDATA;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#DEPARTMENT BY EMPLOYEECOUNT 
+
+SELECT Department, COUNT(Employeecount) AS TotalEmployees
+FROM hrdata
+GROUP BY Department;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#QUESTION 2
+
+SELECT EducationField, AVG(DailyRate) AS AvgDailyRate
+FROM hrdata
+GROUP BY EducationField;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#QUESTION 3
+
+SELECT *
+FROM HRDATA
+WHERE BusinessTravel = 'Travel_Frequently';
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#QUESTION 4
+
+SELECT Department, EducationField, COUNT(*) AS EmployeeCount
+FROM hrdata
+GROUP BY Department, EducationField
+ORDER BY Department, EmployeeCount DESC;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#QUESTION 5
+
+SELECT EmployeeNumber, DistanceFromHome,
+       CASE 
+         WHEN DistanceFromHome <= 10 THEN 'Near'
+         WHEN DistanceFromHome BETWEEN 11 AND 30 THEN 'Medium'
+         ELSE 'Far'
+       END AS DistanceCategory
+FROM HRDATA;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# QUESTION 6
+
+SELECT EDUCATIONFIELD,COUNT(GENDER) AS TOTALCOUNT
+FROM HRDATA
+GROUP BY EDUCATIONFIELD
+ORDER BY TOTALCOUNT DESC;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#AVERAGE ATTRITION BY DEPARTMENT
+SELECT Department,CONCAT(ROUND(AVG(CASE WHEN Attrition = 'Yes' THEN 1 ELSE 0 END) * 100, 1), '%') AS Avg_Attrition_Percentage
+FROM hrdata
+GROUP BY Department;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#MONTHLY INCOME BY EMPLOYEE COUNT AND ATTRITION RATE
+SELECT CASE 
+	WHEN MonthlyIncome BETWEEN 1001 AND 11000 THEN '1001-11000'
+    WHEN MonthlyIncome BETWEEN 11001 AND 21000 THEN '11001-21000'
+    WHEN MonthlyIncome BETWEEN 21001 AND 31000 THEN '21001-31000'
+    WHEN MonthlyIncome BETWEEN 31001 AND 41000 THEN '31001-41000'
+    WHEN MonthlyIncome BETWEEN 41001 AND 51000 THEN '41001-51000'
+    ELSE '51001+'
+  END AS Income_Range,
+
+  COUNT(CASE WHEN Attrition = 'No' THEN 1 END) AS No_Attrition,
+  COUNT(CASE WHEN Attrition = 'Yes' THEN 1 END) AS Yes_Attrition,
+  COUNT(*) AS Total_Employees
+
+FROM hrdata
+
+GROUP BY CASE
+    WHEN MonthlyIncome BETWEEN 1001 AND 11000 THEN '1001-11000'
+    WHEN MonthlyIncome BETWEEN 11001 AND 21000 THEN '11001-21000'
+    WHEN MonthlyIncome BETWEEN 21001 AND 31000 THEN '21001-31000'
+    WHEN MonthlyIncome BETWEEN 31001 AND 41000 THEN '31001-41000'
+    WHEN MonthlyIncome BETWEEN 41001 AND 51000 THEN '41001-51000'
+    ELSE '51001+'
+  END ORDER BY MIN(MonthlyIncome);
+  
+  ------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+# AVERAGE OF TOTAL WORKING YEARS BY DEPARTMENT
+
+SELECT Department,ROUND(AVG(TotalWorkingYears), 1) AS Avg_Total_Working_Years
+FROM hrdata
+GROUP BY Department;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#Average Work-Life Balance by Job Role
+
+SELECT JobRole,ROUND(AVG(WorkLifeBalance), 1) AS Avg_WorkLifeBalance
+FROM hrdata
+GROUP BY JobRole
+ORDER BY Avg_WorkLifeBalance DESC;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#EDUCATION FIELD AND EMPLOYEE COUNT BY GENDER
+  
+SELECT EducationField,
+    COUNT(CASE WHEN Gender = 'Male' THEN 1 END) AS Male,
+    COUNT(CASE WHEN Gender = 'Female' THEN 1 END) AS Female,
+    COUNT(*) AS Total
+FROM hrdata
+GROUP BY EducationField
+ORDER BY EducationField;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+#Count of employee by gender 
+
+    SELECT Gender, COUNT(*) AS EmployeeCount FROM hrdata
+GROUP BY Gender;
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# ATTRITION BY EMPLOYEE COUNT AND YEARS SINCE LAST PROMOTION
+
+SELECT 
+  CASE
+    WHEN YearsSinceLastPromotion BETWEEN 1 AND 10 THEN '01-10 Years'
+    WHEN YearsSinceLastPromotion BETWEEN 11 AND 20 THEN '11-20 Years'
+    WHEN YearsSinceLastPromotion BETWEEN 21 AND 30 THEN '21-30 Years'
+    WHEN YearsSinceLastPromotion BETWEEN 31 AND 40 THEN '31-40 Years'
+    ELSE 'Other'
+  END AS Promotion_Years_Group,
+
+  COUNT(CASE WHEN Attrition = 'Yes' THEN 1 END) AS Attrition_Yes,
+  COUNT(CASE WHEN Attrition = 'No' THEN 1 END) AS Attrition_No,
+  COUNT(*) AS Total_Employees
+
+FROM 
+  hrdata
+
+GROUP BY 
+  CASE
+    WHEN YearsSinceLastPromotion BETWEEN 1 AND 10 THEN '01-10 Years'
+    WHEN YearsSinceLastPromotion BETWEEN 11 AND 20 THEN '11-20 Years'
+    WHEN YearsSinceLastPromotion BETWEEN 21 AND 30 THEN '21-30 Years'
+    WHEN YearsSinceLastPromotion BETWEEN 31 AND 40 THEN '31-40 Years'
+    ELSE 'Other'
+  END
+
+ORDER BY 
+  Promotion_Years_Group;
+  
+  ------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  #DISTANCE FROM HOME BY EMPLOYEE COUNT AND ATTRITION RATE
+  
+  SELECT 
+  CASE
+    WHEN DistanceFromHome BETWEEN 1 AND 10 THEN '01-10 km'
+    WHEN DistanceFromHome BETWEEN 11 AND 20 THEN '11-20 km'
+    WHEN DistanceFromHome BETWEEN 21 AND 30 THEN '21-30 km'
+    WHEN DistanceFromHome BETWEEN 31 AND 40 THEN '31-40 km'
+    WHEN DistanceFromHome BETWEEN 41 AND 50 THEN '41-50 km'
+    ELSE 'Other'
+  END AS Distance_Group,
+
+  COUNT(CASE WHEN Attrition = 'Yes' THEN 1 END) AS Attrition_Yes,
+  COUNT(CASE WHEN Attrition = 'No' THEN 1 END) AS Attrition_No,
+  COUNT(*) AS Total_Employees,
+
+  ROUND(
+    100.0 * COUNT(CASE WHEN Attrition = 'Yes' THEN 1 END) / COUNT(*), 
+    1
+  ) AS Attrition_Rate_Percent
+
+FROM 
+  hrdata
+
+GROUP BY 
+  CASE
+    WHEN DistanceFromHome BETWEEN 1 AND 10 THEN '01-10 km'
+    WHEN DistanceFromHome BETWEEN 11 AND 20 THEN '11-20 km'
+    WHEN DistanceFromHome BETWEEN 21 AND 30 THEN '21-30 km'
+    WHEN DistanceFromHome BETWEEN 31 AND 40 THEN '31-40 km'
+    WHEN DistanceFromHome BETWEEN 41 AND 50 THEN '41-50 km'
+    ELSE 'Other'
+  END
+
+ORDER BY 
+  Distance_Group;
+  
+  ------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+#EMPLOYEE COUNT BY MARITAL STATUS
+  
+SELECT MaritalStatus,COUNT(*) AS EmployeeCount
+FROM hrdata
+GROUP BY MaritalStatus
+ORDER BY EmployeeCount DESC;
+
+  ------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+#EMPLOYEE COUNT BY BusinessTravel
+
+SELECT BusinessTravel,COUNT(*) AS EmployeeCount
+FROM hrdata
+GROUP BY BusinessTravel
+ORDER BY EmployeeCount DESC;
+
+
+
+
+
+
+
